@@ -33,7 +33,8 @@ public class Main {
         }
         System.out.println("Thank you for using the Financial Transaction Tracker!");
     }
-    
+
+    //method to display menu
     private static void displayMenu() {
         System.out.println("\n--- Financial Transaction Tracker ---");
         System.out.println("1. Add Deposit");
@@ -44,6 +45,12 @@ public class Main {
         System.out.print("Enter your choice: ");
     }
 
+    //method to get user's menu
+    private static int getUserChoice() {
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+    //method to add a deposit trans
     private static void addDeposit() {
         System.out.print("Enter deposit date (YYYY-MM-DD): ");
         LocalDate date = LocalDate.parse(scanner.nextLine());
@@ -56,10 +63,13 @@ public class Main {
         System.out.print("Enter amount: ");
         double amount = Double.parseDouble(scanner.nextLine());
 
+    //create and save the deposit trans
         Transaction deposit = new Transaction(date, time, description, vendor, amount);
         FileHandler.saveTransaction(deposit);
         System.out.println("Deposit added successfully.");
     }
+
+    //method to add a payment
     private static void makePayment() {
         System.out.print("Enter payment date (YYYY-MM-DD): ");
         LocalDate date = LocalDate.parse(scanner.nextLine());
@@ -76,7 +86,7 @@ public class Main {
         FileHandler.saveTransaction(payment);
         System.out.println("Payment added successfully.");
     }
-
+    //method to display all trans in ledger
     private static void displayLedger() {
         List<Transaction> transactions = FileHandler.readTransaction();
         System.out.println("\n--- Ledger ---");
@@ -86,6 +96,7 @@ public class Main {
         }
     }
 
+    //method to run reports
     private static void runReports() {
         // Implement report generation logic here
         System.out.println("Report functionality not implemented yet.");

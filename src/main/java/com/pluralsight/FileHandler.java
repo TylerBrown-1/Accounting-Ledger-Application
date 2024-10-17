@@ -13,6 +13,7 @@ public class FileHandler {
 
     // method to save a single trans
     public static void saveTransaction(Transaction transaction) {
+
         try (FileWriter fw = new FileWriter(fileName, true);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
