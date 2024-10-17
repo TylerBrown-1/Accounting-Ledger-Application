@@ -1,5 +1,10 @@
 package com.pluralsight;
 import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FileHandler {
 
@@ -18,9 +23,9 @@ public class FileHandler {
     }
 
     // method to read all trans from the csv file
-    public static List<Transaction> readTransactions() {
+    public static List<Transaction> readTransaction() {
         List<Transaction> transactions = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\\|");

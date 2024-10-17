@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Scanner;
 public class Main {
 
-    Scanner scanner = new Scanner(System.in);
-
+    private static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
-
         boolean running = true;
         while (running) {
             displayMenu();
@@ -35,7 +33,7 @@ public class Main {
         }
         System.out.println("Thank you for using the Financial Transaction Tracker!");
     }
-
+    
     private static void displayMenu() {
         System.out.println("\n--- Financial Transaction Tracker ---");
         System.out.println("1. Add Deposit");
@@ -62,8 +60,35 @@ public class Main {
         FileHandler.saveTransaction(deposit);
         System.out.println("Deposit added successfully.");
     }
+    private static void makePayment() {
+        System.out.print("Enter payment date (YYYY-MM-DD): ");
+        LocalDate date = LocalDate.parse(scanner.nextLine());
+        System.out.print("Enter payment time (HH:mm:ss): ");
+        LocalTime time = LocalTime.parse(scanner.nextLine());
+        System.out.print("Enter description: ");
+        String description = scanner.nextLine();
+        System.out.print("Enter vendor: ");
+        String vendor = scanner.nextLine();
+        System.out.print("Enter amount: ");
+        double amount = -Double.parseDouble(scanner.nextLine());  // Negative for payments
 
+        Transaction payment = new Transaction(date, time, description, vendor, amount);
+        FileHandler.saveTransaction(payment);
+        System.out.println("Payment added successfully.");
+    }
 
+    private static void displayLedger() {
+        List<Transaction> transactions = FileHandler.readTransaction();
+        System.out.println("\n--- Ledger ---");
+        System.out.println("date|time|description|vendor|amount");
+        for (Transaction t : transactions) {
+            System.out.println(t.toString());
+        }
+    }
 
+    private static void runReports() {
+        // Implement report generation logic here
+        System.out.println("Report functionality not implemented yet.");
+    }
 }
-    
+
