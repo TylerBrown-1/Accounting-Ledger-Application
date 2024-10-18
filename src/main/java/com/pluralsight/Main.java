@@ -3,10 +3,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
-public class Main {
+import java.util.stream.Collectors;
 
-    private static Scanner scanner = new Scanner(System.in);
+public class Main {
+    private static Scanner reader = new Scanner(System.in);
     public static void main(String[] args) {
+
+        // cont. loop to display menu
+        // used int and numbers for easier user input
         boolean running = true;
         while (running) {
             displayMenu();
@@ -34,9 +38,9 @@ public class Main {
         System.out.println("Thank you for using the Financial Transaction Tracker!");
     }
 
-    //method to display menu
+    // to display menu
     private static void displayMenu() {
-        System.out.println("\n--- Financial Transaction Tracker ---");
+        System.out.println("\n Financial Transaction Tracker ");
         System.out.println("1. Add Deposit");
         System.out.println("2. Make Payment (Debit)");
         System.out.println("3. Ledger");
@@ -45,23 +49,24 @@ public class Main {
         System.out.print("Enter your choice: ");
     }
 
-    //method to get user's menu
+    // to get user's menu choice
     private static int getUserChoice() {
-        return Integer.parseInt(scanner.nextLine());
+
+        return Integer.parseInt(reader.nextLine());
     }
 
-    //method to add a deposit trans
+    //method to add a deposit trans; prompts user for details
     private static void addDeposit() {
         System.out.print("Enter deposit date (YYYY-MM-DD): ");
-        LocalDate date = LocalDate.parse(scanner.nextLine());
+        LocalDate date = LocalDate.parse(reader.nextLine());
         System.out.print("Enter deposit time (HH:mm:ss): ");
-        LocalTime time = LocalTime.parse(scanner.nextLine());
+        LocalTime time = LocalTime.parse(reader.nextLine());
         System.out.print("Enter description: ");
-        String description = scanner.nextLine();
+        String description = reader.nextLine();
         System.out.print("Enter vendor: ");
-        String vendor = scanner.nextLine();
+        String vendor = reader.nextLine();
         System.out.print("Enter amount: ");
-        double amount = Double.parseDouble(scanner.nextLine());
+        double amount = Double.parseDouble(reader.nextLine());
 
     //create and save the deposit trans
         Transaction deposit = new Transaction(date, time, description, vendor, amount);
@@ -72,21 +77,20 @@ public class Main {
     //method to add a payment
     private static void makePayment() {
         System.out.print("Enter payment date (YYYY-MM-DD): ");
-        LocalDate date = LocalDate.parse(scanner.nextLine());
+        LocalDate date = LocalDate.parse(reader.nextLine());
         System.out.print("Enter payment time (HH:mm:ss): ");
-        LocalTime time = LocalTime.parse(scanner.nextLine());
+        LocalTime time = LocalTime.parse(reader.nextLine());
         System.out.print("Enter description: ");
-        String description = scanner.nextLine();
+        String description = reader.nextLine();
         System.out.print("Enter vendor: ");
-        String vendor = scanner.nextLine();
+        String vendor = reader.nextLine();
         System.out.print("Enter amount: ");
-        double amount = -Double.parseDouble(scanner.nextLine());  // Negative for payments
-
+        double amount = -Double.parseDouble(reader.nextLine());
         Transaction payment = new Transaction(date, time, description, vendor, amount);
         FileHandler.saveTransaction(payment);
         System.out.println("Payment added successfully.");
     }
-    //method to display all trans in ledger
+    //method to display all trans in ledger; reads from file
     private static void displayLedger() {
         List<Transaction> transactions = FileHandler.readTransaction();
         System.out.println("\n--- Ledger ---");
@@ -98,8 +102,104 @@ public class Main {
 
     //method to run reports
     private static void runReports() {
-        // Implement report generation logic here
-        System.out.println("Report functionality not implemented yet.");
+        boolean reportRunning = true;
+        while (reportRunning) {
+            displayReportMenu();
+            int choice = getUserChoice();
+            List<Transaction> transactions = FileHandler.readTransaction();
+
+            switch (choice) {
+                case 1:
+                    displayFilteredTransactions(getMonthToDateTransactions(transactions));
+                    break;
+                case 2:
+                    displayFilteredTransactions(getPreviousMonthTransactions(transactions));
+                    break;
+                case 3:
+                    displayFilteredTransactions(getYearToDateTransactions(transactions));
+                    break;
+                case 4:
+                    displayFilteredTransactions(getPreviousYearTransactions(transactions));
+                    break;
+                case 5:
+                    searchByVendor(transactions);
+                    break;
+                case 0:
+                    reportRunning = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
     }
-}
+        //  display the report menu
+        private static void displayReportMenu() {
+            System.out.println("\n--- Reports Menu ---");
+            System.out.println("1. Month To Date");
+            System.out.println("2. Previous Month");
+            System.out.println("3. Year To Date");
+            System.out.println("4. Previous Year");
+            System.out.println("5. Search by Vendor");
+            System.out.println("0. Back to Main Menu");
+            System.out.print("Enter your choice: ");
+        }
+
+        // display filtered transactions
+        private static void displayFilteredTransactions(List<Transaction> transactions) {
+            System.out.println("\n--- Filtered Transactions ---");
+            System.out.println("date|time|description|vendor|amount");
+            for (Transaction t : transactions) {
+                System.out.println(t.toString());
+            }
+        }
+
+        //  filters by current month to current date
+        private static List<Transaction> getMonthToDateTransactions(List<Transaction> transactions) {
+            LocalDate now = LocalDate.now();
+            LocalDate startOfMonth = now.withDayOfMonth(1);
+            return transactions.stream()
+                    .filter(t -> !t.getDate().isBefore(startOfMonth) && !t.getDate().isAfter(now))
+                    .collect(Collectors.toList());
+        }
+        // filters by prev. month
+        private static List<Transaction> getPreviousMonthTransactions(List<Transaction> transactions) {
+            LocalDate now = LocalDate.now();
+            LocalDate startOfPreviousMonth = now.minusMonths(1).withDayOfMonth(1);
+            LocalDate endOfPreviousMonth = startOfPreviousMonth.plusMonths(1).minusDays(1);
+            return transactions.stream()
+                    .filter(t -> !t.getDate().isBefore(startOfPreviousMonth) && !t.getDate().isAfter(endOfPreviousMonth))
+                    .collect(Collectors.toList());
+        }
+        //filters by year to date
+        private static List<Transaction> getYearToDateTransactions(List<Transaction> transactions) {
+            LocalDate now = LocalDate.now();
+            LocalDate startOfYear = now.withDayOfYear(1);
+            return transactions.stream()
+                    .filter(t -> !t.getDate().isBefore(startOfYear) && !t.getDate().isAfter(now))
+                    .collect(Collectors.toList());
+        }
+        // filters by previous year
+        private static List<Transaction> getPreviousYearTransactions(List<Transaction> transactions) {
+            LocalDate now = LocalDate.now();
+            LocalDate startOfPreviousYear = now.minusYears(1).withDayOfYear(1);
+            LocalDate endOfPreviousYear = startOfPreviousYear.plusYears(1).minusDays(1);
+            return transactions.stream()
+                    .filter(t -> !t.getDate().isBefore(startOfPreviousYear) && !t.getDate().isAfter(endOfPreviousYear))
+                    .collect(Collectors.toList());
+        }
+
+        // method to search transactions by vendor name
+        private static void searchByVendor(List<Transaction> transactions) {
+            System.out.print("Enter vendor name: ");
+            String vendorName = reader.nextLine();
+            List<Transaction> filteredTransactions = transactions.stream()
+                    .filter(t -> t.getVendor().equalsIgnoreCase(vendorName))
+                    .collect(Collectors.toList());
+            displayFilteredTransactions(filteredTransactions);
+        }
+    }
+
+
+
 
