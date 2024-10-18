@@ -26,9 +26,6 @@ public class Main {
                     displayLedger();
                     break;
                 case 4:
-                    runReports();
-                    break;
-                case 5:
                     running = false;
                     break;
                 default:
@@ -40,12 +37,11 @@ public class Main {
 
     // to display menu
     private static void displayMenu() {
-        System.out.println("\n Financial Transaction Tracker ");
+        System.out.println("\nWelcome to the Financial Transaction Tracker ");
         System.out.println("1. Add Deposit");
         System.out.println("2. Make Payment (Debit)");
         System.out.println("3. Ledger");
-        System.out.println("4. Reports");
-        System.out.println("5. Exit");
+        System.out.println("4. Exit");
         System.out.print("Enter your choice: ");
     }
 
@@ -78,7 +74,7 @@ public class Main {
     private static void makePayment() {
         System.out.print("Enter payment date (YYYY-MM-DD): ");
         LocalDate date = LocalDate.parse(reader.nextLine());
-        System.out.print("Enter payment time (HH:mm:ss): ");
+        System.out.print("Enter payment time (HH:mm:ss):");
         LocalTime time = LocalTime.parse(reader.nextLine());
         System.out.print("Enter description: ");
         String description = reader.nextLine();
@@ -90,17 +86,86 @@ public class Main {
         FileHandler.saveTransaction(payment);
         System.out.println("Payment added successfully.");
     }
+
     //method to display all trans in ledger; reads from file
     private static void displayLedger() {
-        List<Transaction> transactions = FileHandler.readTransaction();
-        System.out.println("\n--- Ledger ---");
-        System.out.println("date|time|description|vendor|amount");
+        boolean ledgerRunning = true;
+        while (ledgerRunning) {
+            displayLedgerMenu();
+            int choice = getUserChoice();
+            List<Transaction> transactions = FileHandler.readTransaction();
+
+            switch (choice) {
+                case 1:
+                    displayAllEntries(transactions);
+                    break;
+                case 2:
+                    displayDeposits(transactions);
+                    break;
+                case 3:
+                    displayPayments(transactions);
+                    break;
+                case 4:
+                    runReports();
+                    break;
+                case 0:
+                    ledgerRunning = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    //Displays the ledger menu options to the user.
+
+    private static void displayLedgerMenu() {
+        System.out.println("\n--- Ledger Menu ---");
+        System.out.println("1. All Entries");
+        System.out.println("2. Deposits");
+        System.out.println("3. Payments");
+        System.out.println("4. Reports");
+        System.out.println("0. Back to Main Menu");
+        System.out.print("Enter your choice: ");
+    }
+
+    //Displays all transactions in the ledger
+
+    private static void displayAllEntries(List<Transaction> transactions) {
+        System.out.println("\n--- All Entries ---");
+        displayTransactions(transactions);
+    }
+
+    // displays only deposit transactions.
+    private static void displayDeposits(List<Transaction> transactions) {
+        System.out.println("\n--- Deposits ---");
+        List<Transaction> deposits = transactions.stream()
+                .filter(t -> t.getAmount() > 0)
+                .collect(Collectors.toList());
+        displayTransactions(deposits);
+    }
+
+    //Displays only payment transactions.
+
+    private static void displayPayments(List<Transaction> transactions) {
+        System.out.println("\n--- Payments ---");
+        List<Transaction> payments = transactions.stream()
+                .filter(t -> t.getAmount() < 0)
+                .collect(Collectors.toList());
+        displayTransactions(payments);
+    }
+
+    //method to display a list of transactions.
+
+    private static void displayTransactions(List<Transaction> transactions) {
+        System.out.println("Date | Time | Description | Vendor | Amount");
         for (Transaction t : transactions) {
             System.out.println(t.toString());
         }
     }
 
-    //method to run reports
+    //Manages the report generation process.
+
     private static void runReports() {
         boolean reportRunning = true;
         while (reportRunning) {
@@ -131,8 +196,10 @@ public class Main {
                     System.out.println("Invalid choice. Please try again.");
             }
         }
-
     }
+
+
+
         //  display the report menu
         private static void displayReportMenu() {
             System.out.println("\n--- Reports Menu ---");

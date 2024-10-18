@@ -32,7 +32,9 @@ public class Transaction {
         return date;
     }
 
-
+    public double getAmount() {
+        return amount;
+    }
 
 
     // Updated toString method to match the desired output format
