@@ -37,7 +37,7 @@ public class Main {
 
     // to display menu
     private static void displayMenu() {
-        System.out.println("\nWelcome to the Financial Transaction Tracker ");
+        System.out.println("\nWelcome to your Financial Transaction Tracker ");
         System.out.println("1. Add Deposit");
         System.out.println("2. Make Payment (Debit)");
         System.out.println("3. Ledger");
@@ -198,8 +198,6 @@ public class Main {
         }
     }
 
-
-
         //  display the report menu
         private static void displayReportMenu() {
             System.out.println("\n--- Reports Menu ---");
@@ -266,7 +264,3 @@ public class Main {
             displayFilteredTransactions(filteredTransactions);
         }
     }
-
-
-
-
